@@ -1,0 +1,3 @@
+CREATE DATABASE cliente_db;
+
+CREATE DATABASE agenda_db;
