@@ -1,10 +1,35 @@
-# salao-beleza-microsservicos
-Tema: Sistema de Salão de Beleza.
-Descrição: aplicação distribuída composta por dois microsserviços (cliente-service e agenda-service).
-Tecnologias: Java, Spring Boot, Spring Data JPA, MySQL, Swagger e Maven.
-Portas utilizadas:
-cliente-service: 8081
-agenda-service: 8082
-Como executar: iniciar o MySQL, criar os bancos cliente_db e agenda_db, configurar o application.properties com usuário e senha, e executar os dois projetos.
-Principais endpoints: liste os CRUDs de /clientes e /agendas.
-Comunicação entre os serviços: explique que, ao criar uma agenda, o agenda-service consulta o cliente-service para verificar se o cliente existe antes de salvar.
+# Sistema de Salão de Beleza
+
+Projeto desenvolvido para a disciplina de Sistemas Distribuídos da PUC Goiás.
+
+## Tecnologias utilizadas
+
+- Java 17
+- Spring Boot
+- Spring Data JPA
+- MySQL
+- HTML
+- CSS
+- JavaScript
+- Bootstrap
+
+## Estrutura do projeto
+
+- cliente-service
+- agenda-service
+- frontend
+
+## Como executar
+
+1. Inicie o MySQL.
+2. Execute o `cliente-service` (porta 8081).
+3. Execute o `agenda-service` (porta 8082).
+4. Abra a pasta `frontend` com o Live Server.
+
+## Funcionalidades
+
+- Cadastro de clientes
+- Edição e exclusão de clientes
+- Cadastro de agendamentos
+- Edição e exclusão de agendamentos
+- Seleção do cliente pelo nome
