@@ -50,11 +50,11 @@ async function salvarCliente() {
         }
 
         limparFormularioCliente();
-        listarClientes();
+        await listarClientes();
 
     } catch (erro) {
-        alert("Erro ao cadastrar cliente.");
         console.error(erro);
+        alert("Erro ao cadastrar cliente.");
     }
 
 }
@@ -72,14 +72,18 @@ async function listarClientes() {
     try {
 
         const resposta = await fetch(URL_CLIENTES);
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar clientes.");
+        }
+
         const clientes = await resposta.json();
 
         const tabela = document.getElementById("listaClientes");
         tabela.innerHTML = "";
 
         const select = document.getElementById("clienteSelect");
-        select.innerHTML =
-            '<option value="">Selecione um cliente</option>';
+        select.innerHTML = '<option value="">Selecione um cliente</option>';
 
         clientes.forEach(cliente => {
 
@@ -124,11 +128,15 @@ async function excluirCliente(id) {
 
     try {
 
-        await fetch(`${URL_CLIENTES}/${id}`, {
+        const resposta = await fetch(`${URL_CLIENTES}/${id}`, {
             method: "DELETE"
         });
 
-        listarClientes();
+        if (!resposta.ok) {
+            throw new Error("Erro ao excluir cliente.");
+        }
+
+        await listarClientes();
 
     } catch (erro) {
 
@@ -143,56 +151,49 @@ async function excluirCliente(id) {
 
 async function salvarAgenda() {
 
-    const clienteId =
-        document.getElementById("clienteSelect").value;
-
-    const procedimento =
-        document.getElementById("procedimento").value = "";
-
-    const data =
-        document.getElementById("data").value = "";
-
-    const hora =
-        document.getElementById("hora").value = "";
+    const clienteId = document.getElementById("clienteSelect").value;
+    const procedimento = document.getElementById("procedimento").value.trim();
+    const data = document.getElementById("data").value;
+    const hora = document.getElementById("hora").value;
 
     if (!clienteId || !procedimento || !data || !hora) {
-
         alert("Preencha todos os campos.");
         return;
-
     }
 
     const agenda = {
-
+        clienteId: Number(clienteId),
         procedimento: procedimento,
         dataHora: `${data}T${hora}:00`,
-        status: "Agendado",
-        clienteId: Number(clienteId)
-
+        status: "Agendado"
     };
 
     try {
 
         const resposta = await fetch(URL_AGENDAS, {
-
             method: "POST",
-
             headers: {
                 "Content-Type": "application/json"
             },
-
             body: JSON.stringify(agenda)
-
         });
 
         if (!resposta.ok) {
+
+            const mensagem = await resposta.text();
+            console.error("Erro da API:", mensagem);
+
             throw new Error("Erro ao salvar agenda.");
         }
 
+        document.getElementById("clienteSelect").value = "";
+        document.getElementById("procedimento").value = "";
         document.getElementById("data").value = "";
         document.getElementById("hora").value = "";
 
-        listarAgendas();
+        await listarAgendas();
+
+        alert("Agendamento cadastrado com sucesso!");
 
     } catch (erro) {
 
@@ -208,6 +209,11 @@ async function listarAgendas() {
     try {
 
         const resposta = await fetch(URL_AGENDAS);
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao buscar agendamentos.");
+        }
+
         const agendas = await resposta.json();
 
         const tabela = document.getElementById("listaAgendas");
@@ -238,29 +244,25 @@ async function listarAgendas() {
 
             const dataHora = new Date(agenda.dataHora);
 
-            const data = dataHora.toLocaleDateString("pt-BR");
-
-            const hora = dataHora.toLocaleTimeString("pt-BR", {
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-
             tabela.innerHTML += `
                 <tr>
-        <td>${agenda.id}</td>
-        <td>${nomeCliente}</td>
-        <td>${agenda.procedimento}</td>
-        <td>${data}</td>
-        <td>${hora}</td>
-        <td>${agenda.status}</td>
-        <td>
-            <button
-                class="excluir"
-                onclick="excluirAgenda(${agenda.id})">
-                Excluir
-            </button>
-        </td>
-    </tr>
+                    <td>${agenda.id}</td>
+                    <td>${nomeCliente}</td>
+                    <td>${agenda.procedimento}</td>
+                    <td>${dataHora.toLocaleDateString("pt-BR")}</td>
+                    <td>${dataHora.toLocaleTimeString("pt-BR", {
+                hour: "2-digit",
+                minute: "2-digit"
+            })}</td>
+                    <td>${agenda.status}</td>
+                    <td>
+                        <button
+                            class="excluir"
+                            onclick="excluirAgenda(${agenda.id})">
+                            Excluir
+                        </button>
+                    </td>
+                </tr>
             `;
 
         }
@@ -287,10 +289,10 @@ async function excluirAgenda(id) {
         });
 
         if (!resposta.ok) {
-            throw new Error("Erro ao excluir agenda.");
+            throw new Error("Erro ao excluir agendamento.");
         }
 
-        listarAgendas();
+        await listarAgendas();
 
     } catch (erro) {
 
@@ -301,9 +303,9 @@ async function excluirAgenda(id) {
 
 }
 
-window.onload = function () {
+window.onload = async function () {
 
-    listarClientes();
-    listarAgendas();
+    await listarClientes();
+    await listarAgendas();
 
 };
